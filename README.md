@@ -1,5 +1,9 @@
 ### Hi there 👋
 
+My name is Andy Wheeler. Currently a data scientist at HMS working with health insurances claims (mostly statistical models to identify problematic health claims). Formerly though I was an academic (PhD in criminal justice), and [I mostly worked with police departments to evaluate crime reduction initiatives, and improve the efficient and fairness of different predictive policing systems](https://scholar.google.com/citations?user=iNNqtgwAAAAJ&hl=en). I often [blog on various data science/statistic projects](https://andrewpwheeler.com/) (in quite a few different languages). 
+
+You can reach me at apwheele@gmail.com. Always feel free to reach out with questions!
+
 <!--
 **apwheele/apwheele** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
