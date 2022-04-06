@@ -82,7 +82,7 @@ fn = f'Data from <https://data.raleighnc.gov/datasets/ral::cityworks-potholes/ab
 
 # Making a plot over time
 fig, ax = plt.subplots(figsize=(12,6))
-ax.plot(pc['wd'], pc['counts'], marker='o', markeredgecolor='w')
+ax.plot(pc['wd'], pc['counts'], color='k', marker='o', markeredgecolor='w', markerfacecolor='k')
 ax.set_title('Potholes Filled in Raleigh per week',loc='left')
 ax.annotate(fn, (0,0), (0,-30), xycoords='axes fraction', textcoords='offset points', va='top')
 plt.savefig('PH_Ral_Week.png', dpi=500, bbox_inches='tight')
