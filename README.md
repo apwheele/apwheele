@@ -4,7 +4,7 @@ My name is Andy Wheeler. Currently a data scientist at Gainwell working with hea
 
 You can reach me at apwheele@gmail.com. Always feel free to reach out with questions!
 
-Automated chart creation using Github Actions:
+Automated chart creation using Github Actions :
 
 ![png](PH_Ral_Week.png)
 
