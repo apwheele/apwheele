@@ -1,8 +1,3 @@
-# Updating repo
-#   schedule:
-#    - cron: 10 11 * * THU
-
-
 name: Generate chart for profile
 
 on:
@@ -11,7 +6,7 @@ on:
       - main
       - master
   schedule:
-    - cron: 10 04 * * SAT
+    - cron: 10 04 * * THU
 
 jobs:
   chart:
