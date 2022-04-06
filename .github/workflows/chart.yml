@@ -25,16 +25,14 @@ jobs:
       - name: Install dependencies simple check
         run: |
           python -m pip install --user --upgrade build
-          pip install pandas numpy matplotlib
+          pip install pandas numpy matplotlib requests
           python potholes.py
       - name: Configure Git
         run: |
           git config --global user.email "apwheele@gmail.com"
           git config --global user.name "apwheele"
-      - name: Commit and push if changed
+      - name: Commit and push
         run: |
-          set -e
-          set -x
           git add PH_Ral_Week.png
           git commit -m 'Regenerated weekly chart'
           git push
