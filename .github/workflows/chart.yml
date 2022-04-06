@@ -6,13 +6,15 @@
 name: Generate chart for profile
 
 on:
-   push:
-      branches:
-         - master
+  push:
+    branches:
+      - main
+      - master
 
 jobs:
-   generate:
-     runs-on: ubuntu-latest
+  generate:
+    runs-on: ubuntu-latest
+    environment: "Profile regeneration"
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
