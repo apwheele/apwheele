@@ -27,7 +27,7 @@ jobs:
           python -m pip install --user --upgrade build
           pip install pandas numpy matplotlib
           python potholes.py
-    - name: Configure Git
+      - name: Configure Git
         run: |
           git config --global user.email "apwheele@gmail.com"
           git config --global user.name "apwheele"
