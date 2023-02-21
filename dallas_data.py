@@ -77,7 +77,7 @@ res.to_csv('dallasdata.csv.zip',compression="zip",index=False)
 #res.to_parquet('test.parquet.gzip',compression='gzip',engine='pyarrow')
 
 # Then to read it is
-#csv1 = 'https://github.com/apwheele/apwheele/blob/master/test.csv.zip?raw=true'
+#csv1 = 'https://github.com/apwheele/apwheele/blob/master/dallasdata.csv.zip?raw=true'
 #res = pd.read_csv(csv1,compression='zip')
 # Much snappier than reading directly from Socrata
 ########################
