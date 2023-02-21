@@ -1,4 +1,4 @@
-name: Generate chart for profile
+name: Generate Dallas Data
 
 on:
   push:
@@ -18,9 +18,10 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
-          cache: 'pip'
       - name: Install pandas
-        run: pip install pandas
+        run: |
+          python -m pip install --user --upgrade build
+          pip install pandas
       - name: Create Dallas Data
         run: |
           python dallas_data.py
