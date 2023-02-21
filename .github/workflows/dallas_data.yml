@@ -1,0 +1,37 @@
+name: Generate chart for profile
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  schedule:
+    - cron: 21 09 * * TUE
+
+jobs:
+  chart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          cache: 'pip'
+      - name: Install pandas
+        run: pip install pandas
+      - name: Create Dallas Data
+        run: |
+          python dallas_data.py
+      - name: Configure Git
+        run: |
+          git config --global user.email "apwheele@gmail.com"
+          git config --global user.name "apwheele"
+      - name: Commit and push
+        run: |
+          git add dallasdata.csv.zip
+          git commit -m 'Dallas weekly data run'
+          git push
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+
