@@ -30,6 +30,7 @@ jobs:
           git config --global user.name "apwheele"
       - name: Commit and push
         run: |
+          git pull
           git add dallasdata.csv.zip
           git commit -m 'Dallas weekly data run'
           git push

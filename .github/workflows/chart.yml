@@ -29,6 +29,7 @@ jobs:
           git config --global user.name "apwheele"
       - name: Commit and push
         run: |
+          git pull
           git add PH_Ral_Week.png
           git commit -m 'Regenerated weekly chart'
           git push
