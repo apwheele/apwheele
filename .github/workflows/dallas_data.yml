@@ -1,6 +1,8 @@
 name: Generate Dallas Data
 
 on:
+  push:
+    - branch: main
   schedule:
     - cron: 21 09 * * TUE
 
@@ -19,16 +21,16 @@ jobs:
         run: |
           python -m pip install --user --upgrade build
           pip install -r requirements.txt
-      - name: Create Dallas Data
-        run: |
-          python dallas_data.py
       - name: Configure Git
         run: |
           git config --global user.email "apwheele@gmail.com"
           git config --global user.name "apwheele"
+          git pull
+      - name: Create Dallas Data
+        run: |
+          python dallas_data.py
       - name: Commit and push
         run: |
-          git pull
           git add dallasdata.csv.zip
           git commit -m 'Dallas weekly data run'
           git push

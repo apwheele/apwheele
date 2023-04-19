@@ -14,20 +14,18 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Display Python and Platform version
-        run: python -c "import sys; print(sys.version); print(sys.platform)"
-      - name: Install dependencies simple check
-        run: |
-          python -m pip install --user --upgrade build
-          pip install pandas numpy matplotlib requests
-          python potholes.py
       - name: Configure Git
         run: |
           git config --global user.email "apwheele@gmail.com"
           git config --global user.name "apwheele"
+          git pull
+      - name: Pothole Plot
+        run: |
+          python -m pip install --user --upgrade build
+          pip install pandas numpy matplotlib requests
+          python potholes.py
       - name: Commit and push
         run: |
-          git pull
           git add PH_Ral_Week.png
           git commit -m 'Regenerated weekly chart'
           git push
