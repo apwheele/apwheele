@@ -160,7 +160,7 @@ loc_map = {'Apartment Complex/Building': 1,
 'Liquor Store': 10,
 'Rental Storage Facility': 10,
 'Gambling Facility/Casino/Race Track': 10,
-'ATM Separate from Bank': 10}
+'ATM Separate from Bank': 10,
 'Highway, Street, Alley ETC': 11}
 
 all_loc = set(pd.unique(res['type_location']))
