@@ -32,7 +32,7 @@ jobs:
       - name: Commit and push
         run: |
           git pull
-          git add dallasdata.parquet.gzip
+          git add dallasdata.csv.zip
           git commit -m 'Dallas weekly data run'
           git push
       - run: echo "🍏 This job's status is ${{ job.status }}."

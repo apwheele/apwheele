@@ -38,7 +38,7 @@ res.rename(columns=rename_dict,inplace=True)
 
 # Only incidents at most prior two years
 today = pd.to_datetime('now')
-prior = today - pd.DateOffset(years=4) #or pd.Timedelta(days=365*2)
+prior = today - pd.DateOffset(years=3) #or pd.Timedelta(days=365*2)
 year_end = prior.year
 res = res[res['year_of_incident'] >= year_end].copy()
 
@@ -200,12 +200,14 @@ res.reset_index(drop=True,inplace=True)
 # Save as zip compression
 
 res.drop(columns=['incident_number'],inplace=True) # saves another 1/2 mb
-#res.to_csv('dallasdata.csv.zip',compression="zip",index=False)
+res.to_csv('dallasdata.csv.zip',compression="zip",index=False)
 # This saves a few mb over zipped csv
-res.to_parquet('dallasdata.parquet.gzip',compression='gzip',engine='pyarrow')
+#res.to_parquet('dallasdata.parquet.gzip',compression='gzip',engine='pyarrow')
 
 # Then to read it is
-#csv1 = 'https://github.com/apwheele/apwheele/blob/master/dallasdata.csv.zip?raw=true'
+#csv1 = 'https://github.com/apwheele/apwheele/blob/main/dallasdata.csv.zip?raw=true'
 #res = pd.read_csv(csv1,compression='zip')
+#par1 = 'https://github.com/apwheele/apwheele/blob/main/dallasdata.parquet.gzip?raw=true'
+#res = pd.read_parquet(par1,compression='gzip')
 # Much snappier than reading directly from Socrata
 ########################
