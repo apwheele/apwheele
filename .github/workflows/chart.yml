@@ -1,15 +1,13 @@
 name: Generate chart for profile
 
 on:
-  push:
-    branches:
-      - main
   schedule:
     - cron: 10 04 * * THU
 
 jobs:
   chart:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python
