@@ -15,7 +15,6 @@ import re
 # Grab the data, not sure if "&api_foundry=true" makes any difference
 url = 'https://www.dallasopendata.com/api/views/qv6i-rri7/rows.csv?accessType=DOWNLOAD'
 res = pd.read_csv(url)
-res2 = res.copy()
 
 # This is lower memory, not sure if any faster
 #import requests
@@ -36,9 +35,9 @@ for v in list(res):
 
 res.rename(columns=rename_dict,inplace=True)
 
-# Only incidents at most prior two years
+# Only incidents at most prior three years
 today = pd.to_datetime('now')
-prior = today - pd.DateOffset(years=3) #or pd.Timedelta(days=365*2)
+prior = today - pd.DateOffset(years=3) #or pd.Timedelta(days=365*3)
 year_end = prior.year
 res = res[res['year_of_incident'] >= year_end].copy()
 
@@ -81,6 +80,7 @@ res['nibrs_crime_category'] = res['nibrs_crime_category'].replace(nibr_num)
 res['begin'] = res['date1_of_occurrence'].str[:10] + " " + res['time1_of_occurrence']
 res['end'] = res['date2_of_occurrence'].str[:10] + " " + res['time2_of_occurrence']
 res = res[pd.to_datetime(res['begin']) >= prior].copy()
+# instead of saving as datetime, leave as strings with no seconds
 
 # Parsing Location + Lat/Lon
 add_df = res['location1'].str.split("\n",expand=True)
@@ -88,6 +88,7 @@ res['address'] = add_df[0]
 lat_lon = add_df[2].str[1:-1].str.split(",",expand=True)
 res['lat'] = pd.to_numeric(lat_lon[0])
 res['lon'] = pd.to_numeric(lat_lon[1])
+res = res[~add_df[2].isna()].copy()
 
 
 # Having a reduced set of location categories
@@ -95,6 +96,8 @@ loc_map = {'Apartment Complex/Building': 1,
 'Apartment Residence': 1,
 'Condominium/Townhome Residence': 1,
 'Condominium/Townhome Building': 1,
+'Single Family Residence - Occupied': 1,
+'Single Family Residence - Vacant': 1,
 'Bar/NightClub/DanceHall ETC.': 2,
 'Restaurant/Food Service/TABC Location': 2,
 'Business Office': 3,
@@ -141,27 +144,25 @@ loc_map = {'Apartment Complex/Building': 1,
 'Condominium/Townhome Parking': 8,
 'Parking Lot (Park)': 8,
 'Parking Lot (Apartment)': 8,
-'Single Family Residence - Occupied': 1,
-'Single Family Residence - Vacant': 1,
-'School - Elementary/Secondary': 9,
-'Daycare Facility': 9,
-'School - College/University': 9,
-'School/College': 9,
-'School/Daycare': 9,
-'Retail Store': 10,
-'Grocery/Supermarket': 10,
-'Department/Discount Store': 10,
-'Shopping Mall': 10,
-'Entertainment/Sports Venue': 10,
-'Specialty Store (In a Specific Item)': 10,
-'Pharmacy': 10,
-'Drug Store/Doctors Office/Hospital': 10,
-'Financial Institution': 10,
-'Liquor Store': 10,
-'Rental Storage Facility': 10,
-'Gambling Facility/Casino/Race Track': 10,
-'ATM Separate from Bank': 10,
-'Highway, Street, Alley ETC': 11}
+'Retail Store': 9,
+'Grocery/Supermarket': 9,
+'Department/Discount Store': 9,
+'Shopping Mall': 9,
+'Entertainment/Sports Venue': 9,
+'Specialty Store (In a Specific Item)': 9,
+'Pharmacy': 9,
+'Drug Store/Doctors Office/Hospital': 9,
+'Financial Institution': 9,
+'Liquor Store': 9,
+'Rental Storage Facility': 9,
+'Gambling Facility/Casino/Race Track': 9,
+'ATM Separate from Bank': 9,
+'School - Elementary/Secondary': 10,
+'Daycare Facility': 10,
+'School - College/University': 10,
+'School/College': 10,
+'School/Daycare': 10,
+'Highway, Street, Alley ETC': 0}
 
 all_loc = set(pd.unique(res['type_location']))
 for i in all_loc:
@@ -185,12 +186,14 @@ res['type_location'] = res['type_location'].replace(loc_map)
 #             11: 'Street'}
 
 # Only needed final variables
-keep2 = ['incident_number_w_year','nibrs_crime_category','type_location','begin','end','address','lat','lon']
+keep2 = ['nibrs_crime_category','type_location','begin','end','address','lat','lon']
 res = res[keep2]
-res.columns = ['incident_number','nibrs_cat','location','begin','end','address','lat','lon']
+res.columns = ['nibrs_cat','location','begin','end','address','lat','lon']
 
+# ubyte doesnt do much here for saving as CSV
+# but for parquet is useful
 res['nibrs_cat'] = res['nibrs_cat'].astype(np.ubyte)
-res['location'] = res['nibrs_cat'].astype(np.ubyte)
+res['location'] = res['location'].astype(np.ubyte)
 res['lat'] = res['lat'].astype(np.single)
 res['lon'] = res['lon'].astype(np.single)
 res.reset_index(drop=True,inplace=True)
@@ -198,16 +201,13 @@ res.reset_index(drop=True,inplace=True)
 
 ########################
 # Save as zip compression
-
-res.drop(columns=['incident_number'],inplace=True) # saves another 1/2 mb
 res.to_csv('dallasdata.csv.zip',compression="zip",index=False)
+
 # This saves a few mb over zipped csv
 #res.to_parquet('dallasdata.parquet.gzip',compression='gzip',engine='pyarrow')
 
 # Then to read it is
 #csv1 = 'https://github.com/apwheele/apwheele/blob/main/dallasdata.csv.zip?raw=true'
 #res = pd.read_csv(csv1,compression='zip')
-#par1 = 'https://github.com/apwheele/apwheele/blob/main/dallasdata.parquet.gzip?raw=true'
-#res = pd.read_parquet(par1,compression='gzip')
 # Much snappier than reading directly from Socrata
 ########################
