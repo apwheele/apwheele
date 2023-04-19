@@ -1,9 +1,6 @@
 name: Generate Dallas Data
 
 on:
-  push:
-    branches:
-      - main
   schedule:
     - cron: 21 09 * * TUE
 
