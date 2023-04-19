@@ -92,7 +92,8 @@ res = res[~add_df[2].isna()].copy()
 
 
 # Having a reduced set of location categories
-loc_map = {'Apartment Complex/Building': 1,
+loc_map = {'Highway, Street, Alley ETC': 0,
+'Apartment Complex/Building': 1,
 'Apartment Residence': 1,
 'Condominium/Townhome Residence': 1,
 'Condominium/Townhome Building': 1,
@@ -161,8 +162,7 @@ loc_map = {'Apartment Complex/Building': 1,
 'Daycare Facility': 10,
 'School - College/University': 10,
 'School/College': 10,
-'School/Daycare': 10,
-'Highway, Street, Alley ETC': 0}
+'School/Daycare': 10}
 
 all_loc = set(pd.unique(res['type_location']))
 for i in all_loc:
@@ -173,7 +173,8 @@ for i in all_loc:
 res['type_location'] = res['type_location'].replace(loc_map)
 
 # The final dictionary is
-# loc_label = {1: 'Apartment/Residence',
+# loc_label = {0: 'Street',
+#              1: 'Apartment/Residence',
 #              2: 'Bar/Restaurant',
 #              3: 'Commercial',
 #              4: 'Gas/Convenience',
@@ -181,9 +182,8 @@ res['type_location'] = res['type_location'].replace(loc_map)
 #              6: 'Other',
 #              7: 'Outdoor',
 #              8: 'Parking Lot',
-#              9: 'School',
-#             10: 'Store',
-#             11: 'Street'}
+#              9: 'Store',
+#             10: 'School'}
 
 # Only needed final variables
 keep2 = ['nibrs_crime_category','type_location','begin','end','address','lat','lon']
