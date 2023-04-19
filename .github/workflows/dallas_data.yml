@@ -17,10 +17,11 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.9
+          cache: pip
       - name: Install pandas
         run: |
           python -m pip install --user --upgrade build
-          pip install pandas
+          pip install pandas pyarrow
       - name: Create Dallas Data
         run: |
           python dallas_data.py
@@ -31,7 +32,7 @@ jobs:
       - name: Commit and push
         run: |
           git pull
-          git add dallasdata.csv.zip
+          git add dallasdata.parquet.gzip
           git commit -m 'Dallas weekly data run'
           git push
       - run: echo "🍏 This job's status is ${{ job.status }}."
