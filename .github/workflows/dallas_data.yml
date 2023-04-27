@@ -2,7 +2,7 @@ name: Generate Dallas Data
 
 on:
   schedule:
-    - cron: 21 09 * * TUE
+    - cron: 21 09 * * *
 
 jobs:
   chart:
