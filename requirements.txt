@@ -1,3 +1,2 @@
 # for Dallas workflow
-pandas
-#pyarrow
+pandas == 2.0
