@@ -7,14 +7,36 @@ templates
 Andy Wheeler
 '''
 
+from datetime import datetime
 import numpy as np
 import pandas as pd
+import requests
 import re
 
 ########################
 # Grab the data, not sure if "&api_foundry=true" makes any difference
-url = 'https://www.dallasopendata.com/api/views/qv6i-rri7/rows.csv?accessType=DOWNLOAD'
-res = pd.read_csv(url)
+#url = 'https://www.dallasopendata.com/api/views/qv6i-rri7/rows.csv?accessType=DOWNLOAD'
+#res = pd.read_csv(url)
+
+# newer Socrata does not have a limit
+def query_socrata(base,add_params):
+    # Get the total number of items to query
+    tot_query = base + add_params + "&$group=&$select=count(*)%20AS%20tot"
+    #print(tot_query)
+    # the tot query *NEEDS* to be json format
+    res_tot = requests.get(tot_query)
+    #print(res_tot.text)
+    totn = int(res_tot.json()[0]['tot'])
+    # with Socrata, can query the whole data
+    whole_query = base + add_params + f'&$limit={totn}'
+    #print(whole_query)
+    res = requests.get(whole_query)
+    data = pd.DataFrame(res.json())
+    return data
+
+curr_year = datetime.now().year
+prior4 = datetime.now().year - 4
+res = query_socrata('https://www.dallasopendata.com/resource/qv6i-rri7.json',f'?$where=servyr > {prior4}')
 
 # This is lower memory, not sure if any faster
 #import requests
@@ -38,13 +60,11 @@ res.rename(columns=rename_dict,inplace=True)
 # Only incidents at most prior three years
 today = pd.to_datetime('now')
 prior = today - pd.DateOffset(years=3) #or pd.Timedelta(days=365*3)
-year_end = prior.year
-res = res[res['year_of_incident'] >= year_end].copy()
 
 # Limit the columns, begin/end time
-keep_col = ['incident_number_w_year','nibrs_crime_category','type_location',
-            'date1_of_occurrence','time1_of_occurrence','date2_of_occurrence','time2_of_occurrence',
-            'location1']
+keep_col = ['incidentnum','nibrs_crime_category','premise',
+            'date1','time1','date2_of_occurrence_2','time2',
+            'geocoded_column','incident_address']
 res = res[keep_col]
 
 # Filtering misc and other low categories
@@ -77,19 +97,30 @@ res = res[res['nibrs_crime_category'].isin(nibr_num.keys())].copy()
 res['nibrs_crime_category'] = res['nibrs_crime_category'].replace(nibr_num)
 
 # Creating begin/end times
-res['begin'] = res['date1_of_occurrence'].str[:10] + " " + res['time1_of_occurrence']
-res['end'] = res['date2_of_occurrence'].str[:10] + " " + res['time2_of_occurrence']
+res['begin'] = res['date1'].str[:10] + " " + res['time1']
+res['end'] = res['date2_of_occurrence_2'].str[:10] + " " + res['time2']
 res = res[pd.to_datetime(res['begin']) >= prior].copy()
 # instead of saving as datetime, leave as strings with no seconds
 
 # Parsing Location + Lat/Lon
-add_df = res['location1'].str.split("\n",expand=True)
-res['address'] = add_df[0]
-lat_lon = add_df[2].str[1:-1].str.split(",",expand=True)
-res['lat'] = pd.to_numeric(lat_lon[0])
-res['lon'] = pd.to_numeric(lat_lon[1])
-res = res[~add_df[2].isna()].copy()
+def parse_info(x):
+    d = x[0]
+    if 'latitude' in d:
+        lat = float(d['latitude'])
+    else:
+        lat = None
+    if 'longitude' in d:
+        lon = float(d['longitude'])
+    else:
+        lon = None
+    return [lat,lon]
 
+res = res[~res['geocoded_column'].isna()].reset_index(drop=True)
+add_df = res[['geocoded_column']].apply(parse_info,axis=1,result_type='expand')
+res['lat'] = add_df[0]
+res['lon'] = add_df[1]
+res = res[~res['lat'].isna()].reset_index(drop=True)
+res.rename({'incident_address':'address'},inplace=True)
 
 # Having a reduced set of location categories
 loc_map = {'Highway, Street, Alley ETC': 0,
@@ -164,13 +195,13 @@ loc_map = {'Highway, Street, Alley ETC': 0,
 'School/College': 10,
 'School/Daycare': 10}
 
-all_loc = set(pd.unique(res['type_location']))
+all_loc = set(pd.unique(res['premise']))
 for i in all_loc:
     if i not in loc_map:
         print(i)
         loc_map[i] = 6 # other category
 
-res['type_location'] = res['type_location'].replace(loc_map)
+res['premise'] = res['premise'].replace(loc_map)
 
 # The final dictionary is
 # loc_label = {0: 'Street',
@@ -186,9 +217,16 @@ res['type_location'] = res['type_location'].replace(loc_map)
 #             10: 'School'}
 
 # Only needed final variables
-keep2 = ['nibrs_crime_category','type_location','begin','end','address','lat','lon']
+keep2 = ['nibrs_crime_category','premise','begin','end','incident_address','lat','lon']
 res = res[keep2]
 res.columns = ['nibrs_cat','location','begin','end','address','lat','lon']
+
+# replacing lat/lon for addresses
+res.sort_values(by='begin',inplace=True,ignore_index=True)
+ll_rep = res[['address','lat','lon']].drop_duplicates(subset='address',keep='last')
+res.drop(columns=['lat','lon'],inplace=True)
+res = res.merge(ll_rep,how='left',on='address')
+
 
 # ubyte doesnt do much here for saving as CSV
 # but for parquet is useful
