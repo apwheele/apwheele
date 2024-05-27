@@ -1,3 +1,0 @@
-# for Dallas workflow
-pandas == 2.0
-requests
