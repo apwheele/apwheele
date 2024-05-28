@@ -3,6 +3,9 @@ name: Generate Dallas Data
 on:
   schedule:
     - cron: 21 09 * * *
+  push:
+    paths:
+      - 'dallas_data.py'
 
 jobs:
   chart:
@@ -18,7 +21,7 @@ jobs:
       - name: Install pandas
         run: |
           python -m pip install --user --upgrade build
-          pip install pandas>=2.0 requests
+          pip install -r requirements.txt
       - name: Configure Git
         run: |
           git config --global user.email "apwheele@gmail.com"
