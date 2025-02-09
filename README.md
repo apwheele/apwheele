@@ -8,7 +8,7 @@ Always feel free to reach out with questions!
 
 Automated chart creation using Github Actions :
 
-![png](PH_Ral_Week.png)
+![png](CR_Ral_Week.png)
 
 <!--
 **apwheele/apwheele** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.

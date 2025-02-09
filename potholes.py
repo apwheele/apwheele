@@ -3,6 +3,9 @@ Script to create pothole
 chart, counts per week
 from Raleigh open data
 
+Keeping for historical, they discontinued
+this open data source
+
 Andy Wheeler
 '''
 
