@@ -103,7 +103,8 @@ res = res[pd.to_datetime(res['begin']) >= prior].copy()
 
 # Parsing Location + Lat/Lon
 def parse_info(x):
-    d = x[0]
+    #d = x[0]
+    d = x
     if 'latitude' in d:
         lat = float(d['latitude'])
     else:
@@ -115,7 +116,7 @@ def parse_info(x):
     return [lat,lon]
 
 res = res[~res['geocoded_column'].isna()].reset_index(drop=True)
-add_df = res[['geocoded_column']].apply(parse_info,axis=1,result_type='expand')
+add_df = pd.DataFrame(res['geocoded_column'].apply(parse_info).tolist())
 res['lat'] = add_df[0]
 res['lon'] = add_df[1]
 res = res[~res['lat'].isna()].reset_index(drop=True)
