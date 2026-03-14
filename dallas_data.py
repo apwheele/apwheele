@@ -2,7 +2,6 @@
 Script to save Dallas PD
 data as smaller zipped csv
 for use in live dashboard
-templates
 
 Andy Wheeler
 '''
